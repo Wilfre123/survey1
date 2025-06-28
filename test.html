@@ -1,0 +1,35 @@
+
+
+  <div id="myDiv">
+   
+  </div>
+
+  <button onclick="printDiv('myDiv')">Print</button>
+
+<script>
+function printDiv(divId) {
+  const content = document.getElementById(divId).innerHTML;
+  const printWindow = window.open('', '', 'width=600,height=600');
+  printWindow.document.write(`
+    <html>
+      <head><title>Print</title></head>
+      <body>${content}</body>
+    </html>
+  `);
+  printWindow.document.close();
+  printWindow.print();
+}
+</script>
+<script type="text/javascript">
+     (function populate() {
+      const d = document.getElementById('myDiv');
+      d.innerHTML = `
+        <h2>Dynamically Generated Content</h2>
+        <p>Date: ${new Date().toLocaleDateString()}</p>
+        <ul>
+          <li>Item one</li>
+          <li>Item two</li>
+          <li>Item three</li>
+        </ul>`;
+    })();
+</script>
