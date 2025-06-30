@@ -211,3 +211,96 @@ body {
     width: 100%;
   }
 }
+
+
+
+
+
+
+
+/* table and div design from index.html */
+
+ #coordinatesTable {
+      font-size: 10px;
+    }
+     #div1 {
+      display: block; /* show by default */
+    }
+
+    #div2 {
+      display: none; /* hidden on page load */
+    }
+    /* Reset some defaults */
+  * {
+    box-sizing: border-box;
+  }
+
+
+   h2 {
+    margin-bottom: 8px;
+    font-weight: 700;
+    color: #222;
+  }
+  p {
+    margin-top: 0;
+    margin-bottom: 24px;
+    color: #555;
+    font-size: 14px;
+  }
+
+  .table1 {
+    border-collapse: collapse;
+  width: 100%;
+
+    background-color: white;
+  
+  }
+
+  thead {
+    background-color: #2E8B57;
+    color: white;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 5px 5px;
+    text-align: left;
+    min-width: 120px;
+   font-size: 11px;
+  }
+
+  td[contenteditable="true"] {
+    background-color: #f9fbff;
+    cursor: text;
+    outline: none;
+  }
+
+  td[contenteditable="true"]:focus {
+    background-color: #e7f0fe;
+    box-shadow: inset 0 0 0 2px #4a90e2;
+  }
+
+  tbody tr:hover td {
+    background-color: #f0f6ff;
+  }
+
+ 
+  @media (max-width: 600px) {
+    table {
+      max-width: 90px;
+    }
+    th, td {
+      padding: 10px 12px;
+    }
+   
+  }
+
+  .table_div{
+    width: 100%;
+    height: 300px;
+    overflow: auto;
+  }
+  .table-responsive {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
