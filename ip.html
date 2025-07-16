@@ -1,0 +1,42 @@
+<div class="searchable-select">
+  <input type="text" id="lot-search" placeholder="Search lots..." autocomplete="off">
+  <select id="lot-select" size="5">
+    <option value="">Select Lot</option>
+  </select>
+</div>
+
+<script>
+
+</script>
+
+<style>
+  .searchable-select {
+    position: relative;
+    width: 300px;
+  }
+  
+  #lot-search {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+  
+  #lot-select {
+    width: 100%;
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  #lot-select option {
+    padding: 8px;
+  }
+  
+  #lot-select option:hover {
+    background-color: #f0f0f0;
+  }
+</style>

@@ -1,4 +1,4 @@
-
+//sidebar
 
 
 
@@ -208,131 +208,85 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// Create a custom numbered icon function with hover effect
-function createNumberIcon(number) {
+function abbreviateCorner(corner) {
+  if (!corner) return '';
+  const uppercaseLetters = corner.match(/[A-Z]/g);
+  if (uppercaseLetters && uppercaseLetters.length > 1) {
+    return uppercaseLetters.join('').slice(0, 2);
+  } else if (corner.length > 2) {
+    return corner.slice(0, 2).toUpperCase();
+  }
+  return corner.toUpperCase();
+}
+
+function createNumberIcon(label) {
+  const text = abbreviateCorner(label);
   return L.divIcon({
     className: 'number-icon',
-    html: `<div style="
-      background-color: #2E8B57;
-      color: white;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      transition: all 0.2s ease;
-      box-shadow: 0 0 0 2px white;
-    ">${number}</div>`,
+    html: `<div>${text}</div>`,  // ✅ Fixed: Use backticks for HTML string
     iconSize: [24, 24],
     iconAnchor: [12, 12]
   });
 }
 
-// Add CSS for hover effects
-const style = document.createElement('style');
-style.textContent = `
-  .number-icon:hover div {
-    transform: scale(1.3);
-    z-index: 1000;
-    box-shadow: 0 0 0 3px white, 0 0 10px rgba(0,0,0,0.5);
-  }
-`;
-document.head.appendChild(style);
-
-// Variables to store markers and polyline
-let markers = [];
-let polyline = null;
-let areMarkersVisible = true;
-
-// Get the HTML button and add functionality
+let markers = [], polyline = null, areMarkersVisible = true;
 const toggleBtn = document.getElementById('togglePointsBtn');
-
-// Function to toggle markers visibility
-function toggleMarkers() {
+toggleBtn.addEventListener('click', e => {
+  e.stopPropagation();
   areMarkersVisible = !areMarkersVisible;
-  markers.forEach(marker => {
-    if (areMarkersVisible) {
-      map.addLayer(marker);
-    } else {
-      map.removeLayer(marker);
-    }
+  markers.forEach(m => {
+    areMarkersVisible ? map.addLayer(m) : map.removeLayer(m);
   });
   toggleBtn.textContent = areMarkersVisible ? 'Hide Points' : 'Show Points';
-}
-
-// Add click handler to button
-toggleBtn.addEventListener('click', function(e) {
-  e.stopPropagation();
-  toggleMarkers();
 });
 
-// Fetch and display data
 fetch('http://localhost:3000/data/display_data')
   .then(res => res.json())
   .then(data => {
     const validData = data
-      .map((coord, index) => (typeof coord.lat === 'number' && typeof coord.long === 'number')
-        ? { 
-            latlng: [coord.lat, coord.long],
-            corner: coord.corner || `Point ${index + 1}`,
-            number: index + 1
-          }
-        : null)
+      .map((coord, i) =>
+        typeof coord.lat === 'number' && typeof coord.long === 'number'
+          ? { latlng: [coord.lat, coord.long], corner: coord.corner || `Point ${i + 1}` }
+          : null)
       .filter(Boolean);
 
     if (validData.length === 0) {
-      const noDataControl = L.control({ position: 'topright' });
-      noDataControl.onAdd = () => {
-        const el = L.DomUtil.create('div', 'no-data-control');
-        el.innerHTML = '<strong>Cannot draw because no data found!</strong>';
+      const info = L.control({ position: 'topright' });
+      info.onAdd = () => {
+        const el = L.DomUtil.create('div');
+        el.innerHTML = '<strong>No data to display!</strong>';
         el.style.background = 'white';
         el.style.padding = '8px';
         el.style.borderRadius = '4px';
         return el;
       };
-      noDataControl.addTo(map);
-      console.error("No valid coordinates to display.");
+      info.addTo(map);
+      console.error("No valid coordinates.");
       return;
     }
 
-    // Plot markers with numbers and hover effects
-    markers = validData.map(point => {
-      const marker = L.marker(point.latlng, {
-        icon: createNumberIcon(point.number),
+    markers = validData.map(pt => {
+      const marker = L.marker(pt.latlng, {
+        icon: createNumberIcon(pt.corner),
         riseOnHover: true
-      })
-      .bindPopup(`<b>${point.corner}</b><br>Lat: ${point.latlng[0].toFixed(4)}<br>Long: ${point.latlng[1].toFixed(4)}`)
-      .addTo(map);
+      }).bindPopup(
+        `<b>${pt.corner}</b><br>Lat: ${pt.latlng[0].toFixed(4)}<br>Long: ${pt.latlng[1].toFixed(4)}`
+      ).addTo(map);
 
-      marker.on('mouseover', function() {
-        this.setZIndexOffset(1000);
-      });
-      marker.on('mouseout', function() {
-        this.setZIndexOffset(0);
-      });
-      
+      marker.on('mouseover', () => marker.setZIndexOffset(1000));
+      marker.on('mouseout', () => marker.setZIndexOffset(0));
       return marker;
     });
 
-    // Draw polyline & fit bounds
     if (validData.length >= 2) {
-      polyline = L.polyline(
-        validData.map(point => point.latlng), 
-        {
-          color: 'blue',
-          weight: 4,
-          opacity: 0.7
-        }
-      ).addTo(map);
-
-      map.fitBounds(validData.map(point => point.latlng));
+      polyline = L.polyline(validData.map(pt => pt.latlng), {
+        color: 'blue', weight: 4, opacity: 0.7
+      }).addTo(map);
+      map.fitBounds(validData.map(pt => pt.latlng));
     }
   })
   .catch(err => console.error("Fetch error:", err));
 
-// Click event to show coordinates in popup
 map.on('click', e => {
   L.popup()
     .setLatLng(e.latlng)
@@ -340,7 +294,6 @@ map.on('click', e => {
     .openOn(map);
 });
 
-// Print function
 function printMap() {
   window.print();
 }

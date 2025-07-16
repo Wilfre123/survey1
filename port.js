@@ -1,25 +1,28 @@
-// server.js
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
+const mysql = require('mysql2/promise');
 
-http.createServer(function (req, res) {
-  let filePath = '.' + (req.url === '/' ? '/index.html' : req.url);
-  const extname = path.extname(filePath);
-  let contentType = 'text/html';
+const dbConfig = {
+  host: 'localhost',
+  user: 'root',
+  password: '',       // no password
+  database: 'survey',
+};
 
-  if (extname === '.js') contentType = 'text/javascript';
-  else if (extname === '.css') contentType = 'text/css';
+async function insertData(field1, field2) {
+  try {
+    const connection = await mysql.createConnection(dbConfig);
 
-  fs.readFile(filePath, function (error, content) {
-    if (error) {
-      res.writeHead(404);
-      res.end('404 Not Found');
-    } else {
-      res.writeHead(200, { 'Content-Type': contentType });
-      res.end(content, 'utf-8');
-    }
-  });
-}).listen(8080);
+    const [result] = await connection.execute(
+      'INSERT INTO data (field1, field2) VALUES (?, ?)',
+      [field1, field2]
+    );
 
-console.log('Server running at http://localhost:8080/');
+    await connection.end();
+
+    console.log('Data inserted with ID:', result.insertId);
+  } catch (error) {
+    console.error('Error inserting data:', error);
+  }
+}
+
+// Example usage:
+insertData('example string', 123);

@@ -304,3 +304,68 @@ body {
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
+
+
+#map { height: 500px; }
+    .number-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background-color: rgba(0, 123, 255, 0.6);
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+      text-align: center;
+      transition: transform 0.3s, background-color 0.3s;
+    }
+    .number-icon:hover {
+      transform: scale(1.2);
+      background-color: rgba(0, 123, 255, 0.8);
+    }
+
+    
+
+
+
+/* table for exel*/
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            min-width: 100px;
+        }
+        th {
+            background-color: green;
+            font-weight: bold;
+        }
+        td[contenteditable="true"]:focus {
+            background-color: #ffffcc;
+            outline: 2px solid #4CAF50;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+
+
+
+
+
+
+
+        
