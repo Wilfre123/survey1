@@ -458,21 +458,23 @@ background-color: rgba(128, 128, 128, 0.5);
 
 
   <div class="buttondiv mt-2  " >
-   
-  <button id="togglePointsBtn" class="btn btn-success btn-sm mt-2 mx-2">Hide Points</button>
-   <button id="togglePointsBtn" class="btn btn-success btn-sm mt-2 mx-2"> <i class="bi bi-map"></i> Topo</button>
- <button id="data" class="btn btn-success btn-sm mt-2 mx-2" data-bs-toggle="modal" data-bs-target="#exampleModal">
+<div class="mx-2">
+  <button id="togglePointsBtn" class="btn btn-success btn-sm mt-2 ">Hide Points</button>
+   <button id="togglePointsBtn" class="btn btn-success btn-sm mt-2 "> <i class="bi bi-map"></i> Topo</button>
+ <button id="data" class="btn btn-success btn-sm mt-2 " data-bs-toggle="modal" data-bs-target="#exampleModal">
     <i class="bi bi-server"></i> Data
   </button>
    <button class="btn btn-success btn-sm mt-2" onclick="printMap()"><i class="bi bi-printer"></i> Print </button>
+ </div>
   </div>  
   
 
       <div class="row content1 mx-1  p-3 mb-3 mb-md-0" >
-     
           <div class="form-container">
-            <h4 class="text-success fw-bold mb-sm-3">Map</h4>
-
+         <select id="lotSelect" class="form-select" style="width: 40%;">
+            <option value="" selected disabled>Select a Lot</option>
+        </select>
+       
       <div id="map" class=" mt-2">
 
     </div>
@@ -493,11 +495,15 @@ background-color: rgba(128, 128, 128, 0.5);
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body">
-          
+          <center><h4 style="color: green;" id="selectedLotDisplay"></h4></center>
 
             <button class="btn btn-success btn-sm mt-2" onclick="exportToExcel()">
                 <i class="bi bi-file-earmark-excel"></i> Export Excel
                 </button>
+
+
+       
+
            <div class="mb-3  d-flex align-items-center mt-3" style="position: relative;">
                <input type="text" id="excelFilename" required class="form-control me-2" value="" placeholder="Enter filename" style="width: 150px;">
                  <select id="coordFormat" class="form-select" onchange="updateTableFormat()">
@@ -530,6 +536,7 @@ background-color: rgba(128, 128, 128, 0.5);
     </div>
   </div>
 
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
 
  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.min.js"></script>
@@ -549,70 +556,61 @@ background-color: rgba(128, 128, 128, 0.5);
 
 
 
-
 let originalData = [];
 
-document.addEventListener('DOMContentLoaded', function () {
-  loadTableData();
-
-  document.getElementById('coordFormat').addEventListener('change', updateTableFormat);
-  document.getElementById('exportBtn').addEventListener('click', exportToExcel);
-});
-
-async function loadTableData() {
+async function fetchAndDisplayTableData(lotId) {
   try {
-    // Dynamically get base URL based on where the frontend is served from
     const baseUrl = `${window.location.protocol}//${window.location.hostname}:3000`;
-
-    // Fetch the IP from the backend
-    const ipResponse = await fetch(`${baseUrl}/data/ip`);
-    if (!ipResponse.ok) throw new Error('Network response was not ok');
-    const ipData = await ipResponse.json();
-    const ip = ipData.ip; // Extract IP from response
-
-    // Use the IP to fetch the data
-    const dataResponse = await fetch(`http://${ip}:3000/data/display_data`);
-    const data = await dataResponse.json();
+    const res = await fetch(`${baseUrl}/data/join/${lotId}`);
+    if (!res.ok) throw new Error('Failed to fetch coordinate data');
+    const data = await res.json();
 
     originalData = data;
-    renderTable(data, 'latlong');
-  } catch (error) {
-    console.error('Error fetching data:', error);
-    const tableBody = document.querySelector('#data-table tbody');
-    tableBody.innerHTML = `<tr><td colspan="4" style="color: red;">Error loading data: ${error.message}</td></tr>`;
+    renderCoordinateTable(data, document.getElementById('coordFormat').value);
+  } catch (err) {
+    console.error("Coordinate fetch error:", err);
+    document.querySelector('#data-table tbody').innerHTML =
+      `<tr><td colspan="4" style="color:red;">${err.message}</td></tr>`;
   }
 }
 
-function renderTable(data, format) {
-  const tableBody = document.querySelector('#data-table tbody');
-  tableBody.innerHTML = '';
+function renderCoordinateTable(data, format) {
+  const tbody = document.querySelector('#data-table tbody');
+  tbody.innerHTML = '';
 
-  data.forEach(item => {
-    const row = document.createElement('tr');
-    let latContent, longContent;
+  if (!data || data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="4" style="color:red;">No data available</td></tr>';
+    return;
+  }
 
-    switch (format) {
-      case 'dms':
-        latContent = decimalToDMS(item.lat, true);
-        longContent = decimalToDMS(item.long, false);
-        break;
-      case 'utm':
-        const utm = decimalToUTM(item.lat, item.long);
-        latContent = `${utm.easting}E`;
-        longContent = `${utm.northing}N`;
-        break;
-      default:
-        latContent = item.lat;
-        longContent = item.long;
+  data.forEach((item, index) => {
+    let lat = '', lng = '';
+
+    if (format === 'dms') {
+      lat = decimalToDMS(item.lat, true);
+      lng = decimalToDMS(item.long, false);
+    } else if (format === 'utm') {
+      const utm = decimalToUTM(item.lat, item.long);
+      lat = `${utm.easting}E`;
+      lng = `${utm.northing}N`;
+    } else {
+      lat = item.lat.toFixed(6);
+      lng = item.long.toFixed(6);
     }
 
+    const row = document.createElement('tr');
     row.innerHTML = `
-      <td>${item.corner}</td>
-      <td class="lat-cell">${latContent}</td>
-      <td class="long-cell">${longContent}</td>
+      <td>${item.corner || ''}</td>
+      <td>${lat}</td>
+      <td>${lng}</td>
       <td>${item.elevation ?? ''}</td>
     `;
-    tableBody.appendChild(row);
+
+    if (index === 0) {
+      row.classList.add('highlight');
+    }
+
+    tbody.appendChild(row);
   });
 
   updateTableHeaders(format);
@@ -627,22 +625,15 @@ function updateTableHeaders(format) {
     headers[1].textContent = 'Latitude';
     headers[2].textContent = 'Longitude';
   }
-  headers[3].textContent = 'Elevation';
-}
-
-function updateTableFormat() {
-  const format = document.getElementById('coordFormat').value;
-  renderTable(originalData, format);
 }
 
 function decimalToDMS(decimal, isLat) {
-  const direction = isLat ? (decimal >= 0 ? 'N' : 'S') : (decimal >= 0 ? 'E' : 'W');
-  const absDecimal = Math.abs(decimal);
-  const degrees = Math.floor(absDecimal);
-  const minutesNotTruncated = (absDecimal - degrees) * 60;
-  const minutes = Math.floor(minutesNotTruncated);
-  const seconds = ((minutesNotTruncated - minutes) * 60).toFixed(2);
-  return `${degrees}° ${minutes}' ${seconds}" ${direction}`;
+  const dir = isLat ? (decimal >= 0 ? 'N' : 'S') : (decimal >= 0 ? 'E' : 'W');
+  const abs = Math.abs(decimal);
+  const deg = Math.floor(abs);
+  const min = Math.floor((abs - deg) * 60);
+  const sec = (((abs - deg) * 60 - min) * 60).toFixed(2);
+  return `${deg}° ${min}' ${sec}" ${dir}`;
 }
 
 function decimalToUTM(lat, lng) {
@@ -650,215 +641,281 @@ function decimalToUTM(lat, lng) {
   const easting = (lng - (-180 + (zone - 1) * 6)) * 111319.9;
   const northing = lat * 110574;
   return {
-    zone: zone,
+    zone,
     easting: easting.toFixed(2),
     northing: northing.toFixed(2)
   };
 }
 
 function exportToExcel() {
-  if (typeof XLSX === 'undefined') {
-    alert('Please wait for the export library to load and try again.');
+  if (!originalData || originalData.length === 0) {
+    alert("No data to export!");
     return;
   }
 
-  let filename = document.getElementById('excelFilename').value.trim() || 'coordinates_data';
-  if (!filename.toLowerCase().endsWith('.xlsx')) {
-    filename += '.xlsx';
-  }
-
   const format = document.getElementById('coordFormat').value;
-  let formatName;
-  switch (format) {
-    case 'dms':
-      formatName = "COORDINATE FORMAT: DMS (Degrees, Minutes, Seconds)";
-      break;
-    case 'utm':
-      formatName = "COORDINATE FORMAT: UTM (Universal Transverse Mercator)";
-      break;
-    default:
-      formatName = "COORDINATE FORMAT: Decimal Degrees";
-  }
+  const selectedLot = document.getElementById('lotSelect').options[document.getElementById('lotSelect').selectedIndex].text;
+  
+  // Prepare the data
+  const exportData = originalData.map(item => {
+    let lat = '', lng = '';
 
-  const headers = ['Corner'];
-  if (format === 'utm') {
-    headers.push('Easting', 'Northing');
-  } else {
-    headers.push('Latitude', 'Longitude');
-  }
-  headers.push('Elevation');
+    if (format === 'dms') {
+      lat = decimalToDMS(item.lat, true);
+      lng = decimalToDMS(item.long, false);
+    } else if (format === 'utm') {
+      const utm = decimalToUTM(item.lat, item.long);
+      lat = `${utm.easting}E`;
+      lng = `${utm.northing}N`;
+    } else {
+      lat = item.lat.toFixed(6);
+      lng = item.long.toFixed(6);
+    }
 
-  const rows = Array.from(document.querySelectorAll('#data-table tbody tr')).map(row =>
-    Array.from(row.cells).map(cell => cell.textContent)
-  );
-
-  const worksheetData = [
-    [formatName],
-    [],
-    headers,
-    ...rows
-  ];
-
-  const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-  if (!worksheet['!merges']) worksheet['!merges'] = [];
-  worksheet['!merges'].push({
-    s: { r: 0, c: 0 },
-    e: { r: 0, c: headers.length - 1 }
+    return {
+      'Corner': item.corner || '',
+      [format === 'utm' ? 'Easting' : 'Latitude']: lat,
+      [format === 'utm' ? 'Northing' : 'Longitude']: lng,
+      'Elevation (m)': item.elevation ?? ''
+    };
   });
 
-  worksheet['A1'].s = {
-    font: { bold: true, sz: 14 },
-    alignment: { horizontal: 'center' }
-  };
-
+  // Create workbook
   const workbook = XLSX.utils.book_new();
+  
+  // Create worksheet with data
+  const wsData = [
+    [selectedLot], // Title row (will be merged)
+    ['Corner', format === 'utm' ? 'Easting' : 'Latitude', 
+     format === 'utm' ? 'Northing' : 'Longitude', 'Elevation (m)'], // Header row
+    ...exportData.map(item => [
+      item['Corner'],
+      item[format === 'utm' ? 'Easting' : 'Latitude'],
+      item[format === 'utm' ? 'Northing' : 'Longitude'],
+      item['Elevation (m)']
+    ])
+  ];
+  
+  const worksheet = XLSX.utils.aoa_to_sheet(wsData);
+  
+  // Merge title cells (A1:D1)
+  if (!worksheet['!merges']) worksheet['!merges'] = [];
+  worksheet['!merges'].push({ s: { r: 0, c: 0 }, e: { r: 0, c: 3 } });
+  
+  // Add styling (requires xlsx-style library)
+  if (worksheet['!rows']) {
+    // Title row styling
+    worksheet['!rows'][0] = { hpt: 24, s: { alignment: { horizontal: 'center' }, font: { bold: true, sz: 16 } } };
+    // Header row styling
+    worksheet['!rows'][1] = { s: { font: { bold: true } } };
+  }
+  
+  // Set column widths
+  worksheet['!cols'] = [
+    { wch: 15 }, // Corner
+    { wch: 25 }, // Latitude/Easting
+    { wch: 25 }, // Longitude/Northing
+    { wch: 15 }  // Elevation
+  ];
+  
+  // Add worksheet to workbook
   XLSX.utils.book_append_sheet(workbook, worksheet, "Coordinates");
+
+  // Generate filename with format info
+  const formatLabel = format === 'dms' ? 'DMS' : format === 'utm' ? 'UTM' : 'Decimal';
+  const filename = `${selectedLot.replace(/[^a-z0-9]/gi, '_')}_coordinates_${formatLabel}.xlsx`;
+  
+  // Export the file
   XLSX.writeFile(workbook, filename);
 }
 
-// Load XLSX if not present
-if (typeof XLSX === 'undefined') {
-  const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';
-  document.head.appendChild(script);
-}
+// Initialize the page
+document.addEventListener('DOMContentLoaded', function() {
+  const lotSelect = document.getElementById('lotSelect');
+  const coordFormat = document.getElementById('coordFormat');
+  
+  // Set up event listeners
+  coordFormat.addEventListener('change', () => {
+    if (originalData.length > 0) {
+      renderCoordinateTable(originalData, coordFormat.value);
+    }
+  });
 
+  lotSelect.addEventListener('change', async function() {
+    const lotId = this.value;
+    if (lotId) {
+      await fetchAndDisplayTableData(lotId);
+    }
+  });
 
-
+  // Initialize with first lot if available
+  if (lotSelect.options.length > 1) {
+    lotSelect.value = lotSelect.options[1].value;
+    lotSelect.dispatchEvent(new Event('change'));
+  }
+});
 
 
 
 
         //map
-
-  const map = L.map('map').setView([0, 0], 2);
-
+const map = L.map('map').setView([0, 0], 2);
 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  attribution: '&copy; OpenStreetMap contributors'
+    attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
-
-// Function to abbreviate the corner name (first 2 uppercase letters)
-function abbreviateCorner(corner) {
-  if (!corner) return '';
-  const uppercaseLetters = corner.match(/[A-Z]/g);
-  if (uppercaseLetters && uppercaseLetters.length > 1) {
-    return uppercaseLetters.join('').slice(0, 2);
-  } else if (corner.length > 2) {
-    return corner.slice(0, 2).toUpperCase();
-  }
-  return corner.toUpperCase();
-}
-
-// Function to create a custom icon for the marker
-function createNumberIcon(label) {
-  const text = abbreviateCorner(label);
-  return L.divIcon({
-    className: 'number-icon',
-    html: `<div>${text}</div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12]
-  });
-}
 
 let markers = [], polyline = null, areMarkersVisible = true;
 const toggleBtn = document.getElementById('togglePointsBtn');
-toggleBtn.addEventListener('click', (e) => {
-  e.stopPropagation();
-  areMarkersVisible = !areMarkersVisible;
-  markers.forEach((m) => {
-    areMarkersVisible ? map.addLayer(m) : map.removeLayer(m);
-  });
-  toggleBtn.textContent = areMarkersVisible ? 'Hide Points' : 'Show Points';
-});
+const lotSelect = document.getElementById('lotSelect');
+const lotDisplay = document.getElementById('selectedLotDisplay'); // Added reference to h6 element
 
-// Fetch the data from the backend
-async function fetchData() {
-  try {
-    // Dynamically get base URL based on where the frontend is served from
-    const baseUrl = `${window.location.protocol}//${window.location.hostname}:3000`;
-
-    // First fetch - get IP info from backend
-    const response = await fetch(`${baseUrl}/data/ip`);
-    if (!response.ok) {
-      throw new Error('Network response was not ok');
+function abbreviateCorner(corner) {
+    if (!corner) return '';
+    const uppercaseLetters = corner.match(/[A-Z]/g);
+    if (uppercaseLetters && uppercaseLetters.length > 1) {
+        return uppercaseLetters.join('').slice(0, 2);
+    } else if (corner.length > 2) {
+        return corner.slice(0, 2).toUpperCase();
     }
-    const ipData = await response.json();
-    const ip = ipData.ip; // Get the IP
+    return corner.toUpperCase();
+}
 
-    // Fetch the coordinates data using the IP
-    const coordinatesResponse = await fetch(`http://${ip}:3000/data/display_data`);
-    const data = await coordinatesResponse.json();
-
-    const validData = data
-      .map((coord, i) =>
-        typeof coord.lat === 'number' && typeof coord.long === 'number' && typeof coord.elevation === 'number'
-          ? { latlng: [coord.lat, coord.long], corner: coord.corner || `Point ${i + 1}`, elevation: coord.elevation }
-          : null
-      )
-      .filter(Boolean);
-
-    if (validData.length === 0) {
-      const info = L.control({ position: 'topright' });
-      info.onAdd = () => {
-        const el = L.DomUtil.create('div');
-        el.innerHTML = '<strong>No data to display!</strong>';
-        el.style.background = 'white';
-        el.style.padding = '8px';
-        el.style.borderRadius = '4px';
-        return el;
-      };
-      info.addTo(map);
-      console.error("No valid coordinates.");
-      return;
-    }
-
-    // Create markers from valid data
-    markers = validData.map((pt) => {
-      const marker = L.marker(pt.latlng, {
-        icon: createNumberIcon(pt.corner),
-        riseOnHover: true
-      })
-        .bindPopup(
-          `<b>${pt.corner}</b><br>Lat: ${pt.latlng[0].toFixed(4)}<br>Long: ${pt.latlng[1].toFixed(4)}<br>Elevation: ${pt.elevation} m`
-        )
-        .addTo(map);
-
-      marker.on('mouseover', () => marker.setZIndexOffset(1000));
-      marker.on('mouseout', () => marker.setZIndexOffset(0));
-      return marker;
+function createNumberIcon(label) {
+    const text = abbreviateCorner(label);
+    return L.divIcon({
+        className: 'number-icon',
+        html: `<div>${text}</div>`,
+        iconSize: [24, 24],
+        iconAnchor: [12, 12]
     });
-
-    // Create polyline if there are at least two valid points
-    if (validData.length >= 2) {
-      polyline = L.polyline(validData.map((pt) => pt.latlng), {
-        color: 'blue',
-        weight: 4,
-        opacity: 0.7
-      }).addTo(map);
-      map.fitBounds(validData.map((pt) => pt.latlng));
-    }
-
-  } catch (err) {
-    console.error("Fetch error:", err);
-  }
 }
 
-// Trigger map click event to show popup with coordinates
-map.on('click', (e) => {
-  L.popup()
-    .setLatLng(e.latlng)
-    .setContent(`Lat: ${e.latlng.lat.toFixed(4)}<br>Long: ${e.latlng.lng.toFixed(4)}`)
-    .openOn(map);
+toggleBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    areMarkersVisible = !areMarkersVisible;
+    markers.forEach((m) => {
+        areMarkersVisible ? map.addLayer(m) : map.removeLayer(m);
+    });
+    toggleBtn.textContent = areMarkersVisible ? 'Hide Points' : 'Show Points';
 });
 
-// Print map
-function printMap() {
-  window.print();
+async function fetchLotData() {
+    try {
+        const baseUrl = `${window.location.protocol}//${window.location.hostname}:3000`;
+        const response = await fetch(`${baseUrl}/data/display_lot`);
+        const lotData = await response.json();
+
+        if (!Array.isArray(lotData) || lotData.length === 0) {
+            console.warn("No lots found.");
+            return;
+        }
+
+        // Clear any existing options
+        lotSelect.innerHTML = '<option value="">Select a Lot</option>';
+        
+        lotData.forEach((lot) => {
+            const option = document.createElement('option');
+            option.value = lot.id;
+            option.textContent = lot.lot;
+            lotSelect.appendChild(option);
+        });
+
+        // Enable dropdown change handling
+        lotSelect.addEventListener('change', async function() {
+            const selectedLotId = this.value;
+            if (selectedLotId) {
+                const selectedOption = this.options[this.selectedIndex];
+                lotDisplay.textContent = selectedOption.textContent; // Update h6 with selected lot
+                await fetchMapData(selectedLotId);
+            } else {
+                lotDisplay.textContent = ''; // Clear h6 when no lot is selected
+                clearMap();
+            }
+        });
+
+    } catch (err) {
+        console.error("Error fetching lot data:", err);
+    }
 }
 
-// Call fetchData on page load
-fetchData();
+async function fetchMapData(lotId) {
+    try {
+        clearMap();
+        const baseUrl = `${window.location.protocol}//${window.location.hostname}:3000`;
 
+        // Fetch from the join endpoint
+        const response = await fetch(`${baseUrl}/data/join/${lotId}`);
+        const data = await response.json();
+
+        const validData = data.map((coord, i) =>
+            typeof coord.lat === 'number' && typeof coord.long === 'number' && typeof coord.elevation === 'number'
+                ? { latlng: [coord.lat, coord.long], corner: coord.corner || `Point ${i + 1}`, elevation: coord.elevation }
+                : null
+        ).filter(Boolean);
+
+        if (validData.length === 0) {
+            const info = L.control({ position: 'topright' });
+            info.onAdd = () => {
+                const el = L.DomUtil.create('div');
+                el.innerHTML = '<strong>No data to display!</strong>';
+                el.style.background = 'white';
+                el.style.padding = '8px';
+                el.style.borderRadius = '4px';
+                return el;
+            };
+            info.addTo(map);
+            console.warn("No valid coordinates.");
+            return;
+        }
+
+        markers = validData.map((pt) => {
+            const marker = L.marker(pt.latlng, {
+                icon: createNumberIcon(pt.corner),
+                riseOnHover: true
+            }).bindPopup(
+                `<b>${pt.corner}</b><br>Lat: ${pt.latlng[0].toFixed(4)}<br>Long: ${pt.latlng[1].toFixed(4)}<br>Elevation: ${pt.elevation} m`
+            ).addTo(map);
+
+            marker.on('mouseover', () => marker.setZIndexOffset(1000));
+            marker.on('mouseout', () => marker.setZIndexOffset(0));
+            return marker;
+        });
+
+        if (validData.length >= 2) {
+            polyline = L.polyline(validData.map((pt) => pt.latlng), {
+                color: 'blue',
+                weight: 4,
+                opacity: 0.7
+            }).addTo(map);
+            map.fitBounds(validData.map((pt) => pt.latlng));
+        }
+
+    } catch (err) {
+        console.error("Fetch error:", err);
+    }
+}
+
+function clearMap() {
+    markers.forEach(marker => map.removeLayer(marker));
+    markers = [];
+    if (polyline) {
+        map.removeLayer(polyline);
+        polyline = null;
+    }
+}
+
+map.on('click', (e) => {
+    L.popup()
+        .setLatLng(e.latlng)
+        .setContent(`Lat: ${e.latlng.lat.toFixed(4)}<br>Long: ${e.latlng.lng.toFixed(4)}`)
+        .openOn(map);
+});
+
+function printMap() {
+    window.print();
+}
+
+fetchLotData();
   </script>
 
 </body>

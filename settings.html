@@ -3,240 +3,595 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Modern Dashboard</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <title>Modern Green Sidebar</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+ 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
- <link rel="stylesheet" href="style/style6a.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
 
-
-
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
  
-</head>
-<body>
-  <div class="sidebar collapsed" id="sidebar">
-    <a href="test.html"><i class="bi bi-house-door-fill"></i><span>Home</span></a>
-    <a href="index.html"><i class="bi bi-upload"></i><span>Submit</span></a>
-    <a href="map.html"><i class="bi bi-map "></i><span>Map</span></a>
-    <a href="settings.html"><i class="bi bi-gear-fill"></i><span>Settings</span></a>
-  </div>
-  <div class="topbar">
-    <button class="toggle-btn" onclick="toggleSidebar()"><i class="bi bi-list"></i></button>
-    <h5 class="mb-0 fw-bold text-success">Coordinate Dashboard</h5>
-  </div>
-  <div class="content">
-    <div class="row gy-4">
-      <div class="col-12 col-md-6">
-          <div class="form-container">
-            <h4 class="text-success fw-bold mb-3">Settings</h4>
-        <style>
-.connection_container{
-    width: 90%;
-    height: auto;
-    border-radius: 10px;
-}
 
-/* Container to center the toggle */
-.container {
-    box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: 5px;
-}
 
-/* Title text */
-.title {
-    font-size: 14px;
-    margin-bottom: 10px;
-    color: #333;
-     font-family: 'Montserrat', sans-serif; 
-}
-
-/* Toggle Switch */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ddd;
-    border-radius: 50px;
-    transition: 0.4s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow */
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    border-radius: 50px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: 0.4s;
-}
-
-/* When checked, move the slider */
-input:checked + .slider {
-    background-color: #4CAF50;
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-
-@media (max-width: 768px) {
-    .col-md-6 {
-        margin-bottom: 20px;  /* Add margin bottom on mobile screens */
+ <link rel="stylesheet" href="style/style6g.css">
+  <style>
+    :root {
+      --green-dark: #14532d;
+      --green-main: #198754;
+      --green-hover: #157347;
     }
 
-    /* Adjust container to center content better on smaller screens */
-    .container {
-        margin-left: 10px;
-        margin-right: 10px;
+    body {
+      overflow-x: hidden;
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
     }
 
-    .title {
-        font-size: 20px;  /* Adjust title size on small screens */
-    }
-}
-
-/* General Styling for the Switch */
-.switch {
-    position: relative;
-    display: inline-block;
-    width: 60px;
-    height: 34px;
-}
-
-.switch input {
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
-.slider {
-    position: absolute;
-    cursor: pointer;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: #ddd;
-    border-radius: 50px;
-    transition: 0.4s;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.slider:before {
-    position: absolute;
-    content: "";
-    height: 26px;
-    width: 26px;
-    border-radius: 50px;
-    left: 4px;
-    bottom: 4px;
-    background-color: white;
-    transition: 0.4s;
-}
-
-input:checked + .slider {
-    background-color: #4CAF50;
-}
-
-input:checked + .slider:before {
-    transform: translateX(26px);
-}
-        </style>
-
-            <div class="container-fluid connection_container">
-                <div class="row">
-
-    <div class="col-md-6">
-    <div class="container">
-        <br>
-        <div class="title">Share apps server</div>
-        <label class="switch">
-            <input type="checkbox">
-            <span class="slider"></span>
-        </label>
-         <br>
-    </div>
-    </div>
-
-    <div class="col-md-6">
-      <div class="container">
-         <br>
-        <div class="title">Dark Mode Toggle</div>
-        <label class="switch">
-            <input type="checkbox">
-            <span class="slider"></span>
-        </label>
-        <br>
-    </div>
     
-            </div>
-            </div>
-            </div>
-     
-        </div>
-        </div>
-      <div class="col-12 col-md-6">
-        <div class="table-container">
-          <h4 class="text-success fw-bold mb-3">Coordinates table</h4>
-           <div class=" d-flex justify-content-end">
-           
-
-           
-        </div>
-      </div>
-    </div>
-  </div>
-
- <!-- Input Modal -->
-
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="script/indexn35.js"></script>
-  </body>
-  </html>
-
-  <script>
-     function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const content = document.querySelector('.content');
-    sidebar.classList.toggle('collapsed');
-
-  
-    if (content) {
-      if (sidebar.classList.contains('collapsed')) {
-        content.style.marginLeft = 'var(--sidebar-collapsed-width)';
-      } else {
-        content.style.marginLeft = 'var(--sidebar-width)';
-      }
-    }
+ .small-table {
+    font-size: 0.85rem;         /* smaller text */
   }
 
-  </script>
+  .small-table th,
+  .small-table td {
+    padding: 0.3rem !important; /* tighter spacing */
+  }
+
+  /* Optional: shrink column width if content allows */
+  .small-table th,
+  .small-table td {
+    white-space: nowrap;
+  }
+
+
+    
+
+
+    /* Sidebar */
+    #sidebar {
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      height: 100%;
+      background-color: var(--green-dark);
+      color: white;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    #sidebar.active {
+      left: 0;
+    }
+
+    /* Close button */
+    #sidebar .close-btn {
+      display: none; /* hidden by default */
+      position: absolute;
+      right: 10px;
+      top: 20px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: white;
+      background: transparent;
+      border: none;
+      outline: none;
+      z-index: 1100;
+    }
+
+    /* Show close button only on small screens */
+    @media (max-width: 767.98px) {
+      #sidebar .close-btn {
+        display: block;
+        position: absolute;
+        top: 30px;
+        transition: 0.3s ease;
+      }
+      .close-btn:hover{
+        transform: scale(1.1);
+      }
+    }
+
+
+
+    #sidebar h4 {
+      color: #ffffff;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      margin: 0;
+      padding: 1rem 3rem 1rem 1rem; /* extra padding right for close button */
+    }
+
+    #sidebar .nav-link {
+        top: 20px;
+        position: relative;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 6px;
+      margin-bottom: 5px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #sidebar .nav-link:hover {
+      background-color: var(--green-hover);
+      transform: translateX(5px);
+    }
+
+    /* Topbar */
+    .topbar {
+      background-color: var(--green-main);
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .topbar .toggle-btn {
+      font-size: 1.6rem;
+      cursor: pointer;
+      color: white;
+    }
+
+    /* Content */
+    #content {
+      margin-left: 0;
+      transition: margin-left 0.3s ease;
+    }
+
+    /* Push content only on medium and larger screens */
+    @media (min-width: 768px) {
+      #sidebar.active ~ #content {
+        margin-left: 250px;
+      }
+    }
+
+      
+
+    /* Optional: smooth container appearance */
+    .container {
+      padding: 30px;
+      transition: padding 0.3s ease;
+    }
+
+    .bi {
+      font-size: 1.2rem;
+    }
+    button{
+      font-size: 7px;
+    }
+   
+    /*  modal for adding data  */
+
+    .modal.fade .modal-dialog {
+      transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+      transform: translateY(-50px);
+    }
+
+    .modal.show .modal-dialog {
+      transform: translateY(0);
+    }
+    .modal-dialog {
+      max-width: 60%;
+      margin: 1.75rem auto;
+    }
+
+        @media (max-width: 600px) {
+
+      .modal-dialog {
+      max-width: 90%;
+      margin: 1.75rem auto;
+    }
+
+
+    }
+
+
+    .searchable-select {
+    position: relative;
+    width: 300px;
+  }
   
+  #lot-search {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+  
+  #lot-select {
+    width: 100%;
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  #lot-select option {
+    padding: 8px;
+  }
+  
+  #lot-select option:hover {
+    background-color: #f0f0f0;
+  }
+    
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <h4 class="text-center py-3">
+      Navigation
+      <button class="close-btn close" aria-label="Close sidebar"><i class="bi bi-x-lg"></i></button>
+    </h4>
+    <ul class="nav flex-column px-3">
+      <li class="nav-item">
+        <a class="nav-link" href="ip.html"><i class="bi bi-plus-square"></i> Insert Data</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="plottingmap.html"><i class="bi bi-map"></i> Map</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="settings.html"><i class="bi bi-gear"></i> Settings</a>
+      </li>
+       <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div id="content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <span class="toggle-btn"><i class="bi bi-list"></i></span>
+     <a class="nav-link" href="plottingmap.html"><i class="bi bi-map"></i> Map</a>
+    </div>
+
+   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="row content1 mx-1 p-3 mb-3 mb-md-0">
+  <div class="col-md-6">
+    <div class="table-container">
+  <div class="d-flex align-items-center mb-3">
+    <i class="bi bi-gear text-success me-2"></i>
+    <h4 class="text-success fw-bold mb-0">Settings</h4>
+  </div>
+
+
+     
+
+ <style>
+    :root {
+      --green-primary: #2ecc71;
+      --green-hover: #27ae60;
+      --background-light: #f9fdfb;
+      --modal-bg: rgba(0, 0, 0, 0.5);
+      --modal-content-bg: #ffffff;
+      --font-color: #2f3e46;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background-color: var(--background-light);
+      color: var(--font-color);
+      transition: background-color 0.3s ease;
+    }
+
+    .settings-container {
+      max-width: 620px;
+      margin: 60px auto;
+      background: #ffffff;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      transition: box-shadow 0.3s ease;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 35px;
+      font-size: 26px;
+      font-weight: 600;
+      color: var(--green-primary);
+    }
+
+    .setting-item {
+      padding: 18px;
+      border-bottom: 1px solid #e9f5ef;
+    }
+
+    .setting-item:last-child {
+      border-bottom: none;
+    }
+
+    .setting-link {
+      text-decoration: none;
+      color: var(--green-primary);
+      font-weight: 600;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+
+    .setting-link:hover {
+      color: var(--green-hover);
+    }
+
+    /* Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: var(--modal-bg);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+    }
+
+    .modal.show {
+      display: block;
+      opacity: 1;
+    }
+
+    .modal-content {
+      background-color: var(--modal-content-bg);
+      margin: 10% auto;
+      padding: 25px;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 480px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      position: relative;
+      transform: translateY(-20px);
+      animation: slideIn 0.3s forwards;
+    }
+
+    @keyframes slideIn {
+      to {
+        transform: translateY(0);
+      }
+    }
+
+    .close {
+      position: absolute;
+      top: 15px;
+      right: 18px;
+      color: #aaa;
+      font-size: 24px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: color 0.3s ease;
+    }
+
+    .close:hover {
+      color: #000;
+    }
+
+    input[type="text"], input[type="password"] {
+      width: 100%;
+      padding: 10px 14px;
+      margin-top: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #dceee7;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    input:focus {
+      border-color: var(--green-primary);
+      outline: none;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-size: 14px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+
+ 
+
+    <div class="setting-item">
+      <a href="#updateServer" class="setting-link" data-modal="updateServerModal">Update Server</a>
+    </div>
+
+    <div class="setting-item">
+      <a href="#changePassword" class="setting-link" data-modal="changePasswordModal">Change Password</a>
+    </div>
+
+    <div class="setting-item">
+      <a href="#notifications" class="setting-link" data-modal="notificationsModal">Notification Settings</a>
+    </div>
+  </div>
+
+  <!-- Modals -->
+  <div id="updateServerModal" class="modal">
+    <div class="modal-content">
+      <span class="close" data-modal="updateServerModal">&times;</span>
+      <h3>Update Server</h3>
+      <p>Enter the new server details:</p>
+
+
+      <form id="serverForm">
+<input type="text" id="serverInput" placeholder="Enter server name" required />
+        <div class="d-flex justify-content-end">
+  <button class="btn btn-success btn-sm">
+    <i class="bi bi-arrow-clockwise"></i> Update now
+  </button>
+  </div>
+        </form>
+    <script>
+
+  document.addEventListener('DOMContentLoaded', function () {
+    // Toastr configuration after DOM is fully loaded
+    toastr.options = {
+      closeButton: true,
+      progressBar: true,
+      positionClass: 'toast-bottom-right',
+      timeOut: '4000',
+      preventDuplicates: true,
+    };
+
+    document.getElementById('serverForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+
+      const serverValue = document.getElementById('serverInput').value;
+
+      try {
+        const response = await fetch('http://localhost:3000/data/server', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ server: serverValue }),
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          toastr.success('Server data saved successfully: ' + result.server);
+        } else {
+          toastr.error('Failed to save server data.');
+        }
+      } catch (error) {
+        toastr.error('Error: ' + error.message);
+      }
+    });
+  });
+
+  </script>
+
+
+   
+    
+    </div>
+  </div>
+
+  <div id="changePasswordModal" class="modal">
+    <div class="modal-content">
+      <span class="close" data-modal="changePasswordModal">&times;</span>
+      <h3>Change Password</h3>
+      <p>Enter a new secure password:</p>
+      <input type="password" placeholder="New password">
+    </div>
+  </div>
+
+  <div id="notificationsModal" class="modal">
+    <div class="modal-content">
+      <span class="close" data-modal="notificationsModal">&times;</span>
+      <h3>Notification Settings</h3>
+      <label><input type="checkbox"> Email Alerts</label>
+      <label><input type="checkbox"> SMS Notifications</label>
+    </div>
+
+
+  <script>
+    // Open modal
+    document.querySelectorAll('.setting-link').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const modalId = e.target.getAttribute('data-modal');
+        const modal = document.getElementById(modalId);
+        modal.classList.add('show');
+      });
+    });
+
+    // Close modal
+    document.querySelectorAll('.close').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const modalId = e.target.getAttribute('data-modal');
+        const modal = document.getElementById(modalId);
+        modal.classList.remove('show');
+      });
+    });
+
+    // Close on outside click
+    window.addEventListener('click', e => {
+      document.querySelectorAll('.modal').forEach(modal => {
+        if (e.target === modal) {
+          modal.classList.remove('show');
+        }
+      });
+    });
+  </script>
+
+
+
+
+
+
+      </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="table-container">
+
+
+     
+      </div>
+  </div>
+</div>
+
+  
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  <script>
+
+    $(document).ready(function () {
+      $('.toggle-btn').click(function () {
+        $('#sidebar').toggleClass('active');
+      });
+
+      // Close sidebar when clicking close button
+      $('#sidebar .close-btn').click(function () {
+        $('#sidebar').removeClass('active');
+      });
+    });
+  </script>
+</body>
+</html>
+
+
+

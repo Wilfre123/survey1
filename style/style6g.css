@@ -112,13 +112,6 @@ p {
 }
 
 /* Table Styles */
-.table1,
-table {
-  border-collapse: collapse;
-  width: 100%;
-  background-color: white;
-  margin-bottom: 20px;
-}
 
 .table1 thead,
 thead {
@@ -178,14 +171,8 @@ tbody tr:hover td {
     width: 100%;
   }
 
-  table {
-    max-width: 90px;
-  }
-
-  th,
-  td {
-    padding: 10px 12px;
-  }
+ 
+ 
 }
 
 /* Map */
@@ -214,18 +201,7 @@ tbody tr:hover td {
   background-color: rgba(0, 123, 255, 0.8);
 }
 
-/* General Buttons */
-button {
-  padding: 10px 15px;
-  color: white;
-  border: none;
-  cursor: pointer;
-  margin-top: 10px;
-}
 
-button:hover {
-  background-color: #45a049;
-}
 
 
 

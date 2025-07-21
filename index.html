@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Modern Green Sidebar</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+ 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+
+
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.18/js/bootstrap-select.min.js"></script>
+
+
+ <link rel="stylesheet" href="style/style6g.css">
+  <style>
+    :root {
+      --green-dark: #14532d;
+      --green-main: #198754;
+      --green-hover: #157347;
+    }
+
+
+    
+ .small-table {
+    font-size: 0.85rem;         /* smaller text */
+  }
+
+ 
+
+  /* Optional: shrink column width if content allows */
+  .small-table th,
+  .small-table td {
+    white-space: nowrap;
+  }
+
+
+    
+
+
+    /* Sidebar */
+    #sidebar {
+      width: 250px;
+      position: fixed;
+      top: 0;
+      left: -250px;
+      height: 100%;
+      background-color: var(--green-dark);
+      color: white;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+
+    #sidebar.active {
+      left: 0;
+    }
+
+    /* Close button */
+    #sidebar .close-btn {
+      display: none; /* hidden by default */
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: white;
+      background: transparent;
+      border: none;
+      outline: none;
+      z-index: 1100;
+    }
+
+    /* Show close button only on small screens */
+    @media (max-width: 767.98px) {
+      #sidebar .close-btn {
+        display: block;
+        position: absolute;
+        top: -10px;
+      }
+    }
+
+
+
+    #sidebar h4 {
+      color: #ffffff;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+      position: relative;
+      margin: 0;
+      padding: 1rem 3rem 1rem 1rem; /* extra padding right for close button */
+    }
+
+    #sidebar .nav-link {
+        top: 20px;
+        position: relative;
+      color: #ffffff;
+      padding: 12px 20px;
+      border-radius: 6px;
+      margin-bottom: 5px;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #sidebar .nav-link:hover {
+      background-color: var(--green-hover);
+      transform: translateX(5px);
+    }
+
+    /* Topbar */
+    .topbar {
+      background-color: var(--green-main);
+      color: white;
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 999;
+    }
+
+    .topbar .toggle-btn {
+      font-size: 1.6rem;
+      cursor: pointer;
+      color: white;
+    }
+
+    /* Content */
+    #content {
+      margin-left: 0;
+      transition: margin-left 0.3s ease;
+    }
+
+    /* Push content only on medium and larger screens */
+    @media (min-width: 768px) {
+      #sidebar.active ~ #content {
+        margin-left: 250px;
+      }
+    }
+
+      
+
+    /* Optional: smooth container appearance */
+    .container {
+      padding: 30px;
+      transition: padding 0.3s ease;
+    }
+
+    .bi {
+      font-size: 1.2rem;
+    }
+    button{
+      font-size: 7px;
+    }
+   
+
+
+
+
+
+
+
+
+    /*  modal for adding data  */
+
+    .modal.fade .modal-dialog {
+      transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+      transform: translateY(-50px);
+    }
+
+    .modal.show .modal-dialog {
+      transform: translateY(0);
+    }
+    .modal-dialog {
+      max-width: 60%;
+      margin: 1.75rem auto;
+    }
+
+        @media (max-width: 600px) {
+
+      .modal-dialog {
+      max-width: 90%;
+      margin: 1.75rem auto;
+    }
+
+    }
+
+
+
+
+
+
+
+
+
+
+    .searchable-select {
+    position: relative;
+    width: 300px;
+  }
+  
+  #lot-search {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+  }
+  
+  #lot-select {
+    width: 100%;
+    display: none;
+    position: absolute;
+    z-index: 1000;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  #lot-select option {
+    padding: 8px;
+  }
+  
+  #lot-select option:hover {
+    background-color: #f0f0f0;
+  }
+
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <h4 class="text-center py-3">
+      Navigation
+      <button class="close-btn" aria-label="Close sidebar"><i class="bi bi-x-lg"></i></button>
+    </h4>
+    <ul class="nav flex-column px-3">
+      <li class="nav-item">
+        <a class="nav-link" href="ip.html"><i class="bi bi-plus-square"></i> Insert Data</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="plottingmap.html"><i class="bi bi-map"></i> Map</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="settings.html"><i class="bi bi-gear"></i> Settings</a>
+      </li>
+       <li class="nav-item">
+        <a class="nav-link" href="#"><i class="bi bi-box-arrow-right"></i> Logout</a>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div id="content">
+    <!-- Topbar -->
+    <div class="topbar">
+      <span class="toggle-btn"><i class="bi bi-list"></i></span>
+     <a class="nav-link" href="plottingmap.html"><i class="bi bi-map"></i> Map</a>
+    </div>
+
+   
+
+
+
+
+
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Coordinates Data</h5>
+        <button type="button" style="font-size: 16px;" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+         
+
+
+
+
+
+
+<style>
+  
+  
+    
+    .table thead th {
+      text-align: center;
+    }
+    .table td {
+      text-align: center;
+      vertical-align: middle;
+    }
+    .table td[contenteditable="true"] {
+      background-color: #fdfdfd;
+      cursor: text;
+    }
+    .table td[contenteditable="true"]:focus {
+      background-color: #e8f5e9;
+      box-shadow: inset 0 0 0 1px #66bb6a;
+    }
+    .btn-remove {
+      color: #e53935;
+      font-size: 1.3rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-remove:hover {
+      color: #b71c1c;
+      color: white;
+    }
+    .searchable-select {
+      margin-bottom: 1rem;
+      max-width: 400px;
+    }
+  </style>
+</head>
+<body>
+
+   <h4 class="text-success fw-bold mb-sm-3">Submit Coordinates</h4>
+   <div class="searchable-select">
+      
+      <input type="text" id="lot-search" class="form-control mb-2" placeholder="Select lot" autocomplete="off">
+      <select id="lot-select" class="form-select" size="5">
+        <option value="">Select Lot</option>
+      </select>
+    </div>
+    
+  <div style="overflow: auto;">
+    
+
+    <!-- HTML Select and Filter -->
+   
+
+    <!-- Editable Table -->
+    <table id="editableTable" class="table table-bordered table-hover align-middle mt-2">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Latitude</th>
+          <th>Longitude</th>
+          <th>Elevation</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+ 
+  </div>
+
+   <div class="d-flex justify-content-between mt-3">
+      <button id="addRowBtn" class="btn btn-primary btn-sm">➕ Add Row</button>
+      <button id="submitBtn" class="btn btn-success btn-sm">✅ Submit</button>
+    </div>
+
+
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+    
+<div class="modal fade" id="lotmodal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Lot Data</h5>
+        <button type="button" style="font-size: 16px;" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+            <h4 class="text-success fw-bold mb-sm-3">Submit Lot</h4>
+          
+              
+      <form id="lotform">
+  <input id="lot" name="lot" class="form-control" placeholder="Enter lot name" style="width: 100%;">
+    <div class="d-flex justify-content-between mt-3">
+    
+      <button class="btn btn-success btn-sm">✅ Submit</button>
+    </div>
+</form>
+
+
+
+
+<script>
+document.getElementById('lotform').addEventListener('submit', async (e) => { 
+    e.preventDefault();  // Prevent the form from submitting the traditional way
+    
+    // Get the input value
+    const lot = document.getElementById('lot').value;
+    
+    // Check if input is empty
+    if (!lot) {
+        toastr.error('Lot name is required');
+        return;
+    }
+
+    // Configure toastr options
+    toastr.options = {
+        closeButton: true,
+        progressBar: true,
+        positionClass: 'toast-bottom-right',  // Change position to bottom-right
+        timeOut: '4000',
+        preventDuplicates: true,
+    };
+
+    try {
+        // Make the API request to insert the lot
+        const response = await fetch('http://192.168.43.64:3000/data/insert_lot', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ lot }),  // Send the lot name as JSON
+        });
+
+        const result = await response.json();  // Parse JSON from response
+        
+        // Use toastr to notify the user based on the response
+        if (response.ok) {
+            toastr.success('Lot inserted successfully!');
+        } else {
+            toastr.error(`Error: ${result.message || 'Unknown error'}`);
+        }
+    } catch (err) {
+        // Handle errors during fetch (e.g., network issues)
+        console.error('Error:', err);
+        toastr.error('There was an issue with your request. Please try again.');
+    }
+});
+
+
+</script>
+
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+
+
+
+
+
+
+
+<div class="row content1 mx-1 p-3 mb-3 mb-md-0">
+
+  <!-- LEFT COLUMN (9/12 width) -->
+  <div class="col-md-8">
+    <div class="table-container">
+      <h4 class="text-success fw-bold mb-3">Coordinates table</h4>
+<br>
+      <!-- Buttons -->
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal">
+        <i class="bi bi-box-arrow-up-right"></i> Add corner
+      </button>
+    
+
+      <!-- Search and Row Count -->
+      <div class="d-flex justify-content-end mt-3">
+        <input type="text" id="searchInput" class="form-control me-3" placeholder="Search" style="width: 50%;">
+        <select id="rowCount" class="form-select w-auto" onchange="updateRowSelection()">
+          <option value="0">Row</option>
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
+          <option value="40">40</option>
+        </select>
+      </div>
+
+      <!-- Table with scroll -->
+      <div class="table-responsive mt-3" style="max-height: 300px; overflow-y: auto;">
+        <table id="myTable" class="table table-striped table-hover table-sm small-table">
+          <thead>
+            <tr>
+              <th>Corner</th>
+              <th>Longitude</th>
+              <th>Latitude</th>
+              <th>Elevation</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="coordinatesTable">
+            <tr class="no-data-row">
+              <td colspan="5" class="text-center">No data</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT COLUMN (3/12 width) -->
+  <div class="col-md-4">
+ <div class="table-container">
+
+  <h4 class="text-success fw-bold mb-3">Lot table</h4>
+<br>
+   <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#lotmodal">
+        <i class="bi bi-box-arrow-up-right"></i> Add Lot
+      </button>
+      </div>
+
+  </div>
+</div>
+
+
+
+
+
+      
+
+
+   <!-- Input Modal -->
+<div class="modal fade" id="inputModal" tabindex="-1" aria-labelledby="inputModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="coordinatesForm" class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="inputModalLabel">Update Coordinates</h5>
+        <button type="button" style="font-size: 15px;" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label for="corner" class="form-label">Corner</label>
+          <input type="text" name="corner" id="corner" class="form-control" placeholder="Corner (optional)">
+        </div>
+        <div class="mb-3">
+          <label for="long" class="form-label">Longitude</label>
+          <input type="number" step="any" name="long" id="long" class="form-control" placeholder="Longitude" required>
+        </div>
+        <div class="mb-3">
+          <label for="lat" class="form-label">Latitude</label>
+          <input type="number" step="any" name="lat" id="lat" class="form-control" placeholder="Latitude" required>
+        </div>
+           <div class="mb-3">
+          <label for="lat" class="form-label">Elevation</label>
+          <input type="number" step="any" name="elevation" id="elevation" class="form-control" placeholder="Latitude" required>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script/indexn35.js"></script>
+
+
+
+
+
+
+
+
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+
+  <script>
+
+    $(document).ready(function () {
+      $('.toggle-btn').click(function () {
+        $('#sidebar').toggleClass('active');
+      });
+
+      // Close sidebar when clicking close button
+      $('#sidebar .close-btn').click(function () {
+        $('#sidebar').removeClass('active');
+      });
+    });
+  </script>
+</body>
+</html>
+ <script>
+ 
+
+
+
+
+
+
+
+
+
+
+ async function populateLotSelect() {
+    try {
+      const response = await fetch('http://localhost:3000/data/display_lot');
+      const lots = await response.json();
+
+      const select = document.getElementById('lot-select');
+      select.innerHTML = '<option value="">Select Lot</option>'; // Reset options
+
+      lots.forEach(lot => {
+        const option = document.createElement('option');
+        option.value = lot.id;
+        option.textContent = lot.lot;
+        select.appendChild(option);
+      });
+    } catch (error) {
+      console.error('Failed to load lots:', error);
+    }
+  }
+
+  // Add search functionality
+  document.getElementById('lot-search').addEventListener('input', function() {
+    const searchTerm = this.value.toLowerCase();
+    const options = document.getElementById('lot-select').options;
+    
+    for (let i = 0; i < options.length; i++) {
+      const optionText = options[i].text.toLowerCase();
+      options[i].style.display = optionText.includes(searchTerm) ? '' : 'none';
+    }
+  });
+
+  // Show dropdown when search input is clicked
+  document.getElementById('lot-search').addEventListener('click', function() {
+    document.getElementById('lot-select').style.display = 'block';
+  });
+
+  // Hide dropdown when clicking outside
+  document.addEventListener('click', function(e) {
+    if (e.target.id !== 'lot-search' && e.target.id !== 'lot-select') {
+      document.getElementById('lot-select').style.display = 'none';
+    }
+  });
+
+  // Select option when clicked and update search input
+  document.getElementById('lot-select').addEventListener('click', function(e) {
+    if (e.target.tagName === 'OPTION') {
+      document.getElementById('lot-search').value = e.target.text;
+      this.style.display = 'none';
+    }
+  });
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', function() {
+    populateLotSelect();
+    document.getElementById('lot-select').style.display = 'none';
+  });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// display data in table
+
+
+const insertedDataKeys = new Set();
+
+function createDataKey(data) {
+  return `${data.corner || ''}|${data.long}|${data.lat}|${data.elevation || ''}`;
+}
+
+// Helper to fetch with fallback to localhost
+async function fetchWithFallback(urlPrimary, urlFallback, options = {}) {
+  try {
+    const resp = await fetch(urlPrimary, options);
+    if (!resp.ok) throw new Error(`Primary fetch failed: ${resp.status}`);
+    return resp;
+  } catch (err) {
+    console.warn(`Primary fetch failed, trying fallback: ${err.message}`);
+    const respFallback = await fetch(urlFallback, options);
+    if (!respFallback.ok) throw new Error(`Fallback fetch failed: ${respFallback.status}`);
+    return respFallback;
+  }
+}
+
+function appendToTable(data, ip) {
+  const tbody = document.getElementById('coordinatesTable');
+
+  if (tbody.querySelector('td[colspan]')) {
+    tbody.innerHTML = '';
+  }
+
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td class="text-center align-middle">${data.corner || ''}</td>
+    <td class="text-center align-middle">${data.long}</td>
+    <td class="text-center align-middle">${data.lat}</td>
+    <td class="text-center align-middle">${data.elevation || ''}</td>
+    <td class="text-center align-middle">
+      <button class="btn btn-primary btn-sm update-btn" data-id="${data.id}">
+        <i class="bi bi-arrow-clockwise"></i> Update
+      </button>
+      <button class="btn btn-danger btn-sm delete-btn" data-id="${data.id}">
+        <i class="bi bi-trash"></i> Delete
+      </button>
+    </td>
+  `;
+
+  tbody.appendChild(tr);
+
+  // Update event
+  tr.querySelector('.update-btn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const id = e.currentTarget.getAttribute('data-id');
+
+    const primaryUrl = `http://${ip}:3000/data/${id}`;
+    const fallbackUrl = `http://localhost:3000/data/${id}`;
+
+    try {
+      const resp = await fetchWithFallback(primaryUrl, fallbackUrl);
+      if (resp.ok) {
+        const item = await resp.json();
+        const form = document.getElementById('coordinatesForm');
+        form.querySelector('input[name="corner"]').value = item.corner || '';
+        form.querySelector('input[name="long"]').value = item.long;
+        form.querySelector('input[name="lat"]').value = item.lat;
+        const elevationInput = form.querySelector('input[name="elevation"]');
+        if (elevationInput) {
+          elevationInput.value = item.elevation || '';
+        }
+        form.setAttribute('data-edit-id', id);
+
+        const inputModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('inputModal'));
+        inputModal.show();
+      } else {
+        alert('Failed to fetch data for update');
+      }
+    } catch (err) {
+      alert('Error: ' + err.message);
+    }
+  });
+
+  // Delete event
+  tr.querySelector('.delete-btn').addEventListener('click', async (e) => {
+    e.preventDefault();
+    const id = e.currentTarget.getAttribute('data-id');
+
+    const primaryUrl = `http://${ip}:3000/data/${id}`;
+    const fallbackUrl = `http://localhost:3000/data/${id}`;
+
+    try {
+      const resp = await fetchWithFallback(primaryUrl, fallbackUrl, { method: 'DELETE' });
+      if (resp.ok) {
+        tr.remove();
+        insertedDataKeys.delete(createDataKey(data));
+        if (!tbody.children.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No data</td></tr>';
+        }
+
+        toastr.options = {
+          closeButton: true,
+          progressBar: true,
+          positionClass: 'toast-bottom-right',
+          timeOut: '4000',
+          preventDuplicates: true,
+        };
+        toastr.success('Data deleted successfully!');
+      } else {
+        alert('Failed to delete');
+      }
+    } catch (err) {
+      alert('Delete error: ' + err.message);
+    }
+  });
+}
+
+async function fetchData() {
+  try {
+    const baseUrl = `${window.location.protocol}//${window.location.hostname}:3000`;
+
+    // Get backend IP
+    const response = await fetch(`${baseUrl}/data/ip`);
+    if (!response.ok) throw new Error('Failed to get IP from backend');
+    const ipData = await response.json();
+    const ip = ipData.ip;
+
+    const primaryUrl = `http://${ip}:3000/data/display_data`;
+    const fallbackUrl = `http://localhost:3000/data/display_data`;
+
+    const resp = await fetchWithFallback(primaryUrl, fallbackUrl);
+
+    const tableData = await resp.json();
+    const tbody = document.getElementById('coordinatesTable');
+    tbody.innerHTML = '';
+
+    insertedDataKeys.clear();
+
+    if (tableData.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No data</td></tr>';
+      return;
+    }
+
+    tableData.forEach(item => {
+      const key = createDataKey(item);
+      insertedDataKeys.add(key);
+      appendToTable(item, ip);
+    });
+  } catch (err) {
+    alert('Fetch error: ' + err.message);
+  }
+}
+
+document.getElementById('coordinatesForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  const formData = new FormData(this);
+  const corner = formData.get('corner') || '';
+  const longRaw = formData.get('long');
+  const latRaw = formData.get('lat');
+  const elevationRaw = formData.get('elevation');
+
+  const long = parseFloat(longRaw);
+  const lat = parseFloat(latRaw);
+  const elevation = elevationRaw ? parseFloat(elevationRaw) : null;
+
+  if (longRaw === null || longRaw.trim() === '' || isNaN(long)) {
+    alert('Please enter a valid longitude.');
+    return;
+  }
+
+  if (latRaw === null || latRaw.trim() === '' || isNaN(lat)) {
+    alert('Please enter a valid latitude.');
+    return;
+  }
+
+  if (elevationRaw && isNaN(elevation)) {
+    alert('Please enter a valid elevation.');
+    return;
+  }
+
+  const data = { corner, long, lat, elevation };
+  const editId = this.getAttribute('data-edit-id');
+  const key = createDataKey(data);
+
+  if (!editId && insertedDataKeys.has(key)) {
+    alert('Data already inserted.');
+    return;
+  }
+
+  try {
+    const baseUrl = `${window.location.protocol}//${window.location.hostname}:3000`;
+    const response = await fetch(`${baseUrl}/data/ip`);
+    if (!response.ok) throw new Error('Failed to get IP from backend');
+    const ipData = await response.json();
+    const ip = ipData.ip;
+
+    const primaryUrl = editId
+      ? `http://${ip}:3000/data/${editId}`
+      : `http://${ip}:3000/data`;
+    const fallbackUrl = editId
+      ? `http://localhost:3000/data/${editId}`
+      : `http://localhost:3000/data`;
+
+    const resp = await fetchWithFallback(primaryUrl, fallbackUrl, {
+      method: editId ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+
+    if (resp.ok) {
+      const result = await resp.json();
+
+      toastr.options = {
+        closeButton: true,
+        progressBar: true,
+        positionClass: 'toast-bottom-right',
+        timeOut: '4000',
+        preventDuplicates: true,
+      };
+      toastr.success(editId ? 'Data updated successfully!' : 'Data added successfully!');
+
+      const inputModalEl = document.getElementById('inputModal');
+      const inputModal = bootstrap.Modal.getInstance(inputModalEl);
+      if (inputModal) {
+        inputModal.hide();
+      }
+
+      if (editId) {
+        insertedDataKeys.clear();
+        document.getElementById('coordinatesTable').innerHTML = '';
+        await fetchData();
+        this.removeAttribute('data-edit-id');
+      } else {
+        insertedDataKeys.add(key);
+        appendToTable(result, ip);
+      }
+
+      this.reset();
+    } else if (resp.status === 409) {
+      alert('Duplicate entry.');
+    } else {
+      alert('Failed to save data.');
+    }
+  } catch (err) {
+    alert('Submit error: ' + err.message);
+  }
+});
+
+window.addEventListener('load', fetchData);
+
+
+
+
+
+
+
+//  insert table in index.html
+
+window.addEventListener('DOMContentLoaded', () => {
+  // ✅ Toastr position setup
+  toastr.options = {
+    "positionClass": "toast-bottom-right"
+  };
+
+  let allLots = [];
+  let selectedLot = null;
+
+  const lotSearchInput = document.getElementById('lot-search');
+  const lotSelect = document.getElementById('lot-select');
+  const tableBody = document.querySelector('#editableTable tbody');
+
+  // ✅ Fetch and populate lots
+  async function fetchLots() {
+    try {
+      const res = await fetch('http://localhost:3000/data/display_lot');
+      allLots = await res.json();
+      renderLotOptions(allLots);
+    } catch (err) {
+      console.error('Failed to fetch lots:', err);
+      toastr.error('Could not load lots');
+    }
+  }
+
+  function renderLotOptions(lots) {
+    lotSelect.innerHTML = '<option value="">Select Lot</option>';
+    lots.forEach(lot => {
+      const option = document.createElement('option');
+      option.value = lot.id;
+      option.textContent = lot.lot;
+      lotSelect.appendChild(option);
+    });
+  }
+
+  // ✅ Filter lots on search input
+  lotSearchInput.addEventListener('input', () => {
+    const search = lotSearchInput.value.toLowerCase();
+    const filtered = allLots.filter(lot => lot.lot.toLowerCase().includes(search));
+    renderLotOptions(filtered);
+  });
+
+  // ✅ Save selected lot
+  lotSelect.addEventListener('change', () => {
+    const selectedId = lotSelect.value;
+    selectedLot = allLots.find(lot => lot.id == selectedId);
+  });
+
+  // ✅ Add new editable row
+  function addRow() {
+    const row = document.createElement('tr');
+    row.innerHTML = `
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+      <td><button class="btn-remove btn btn-sm btn-danger">&times;</button></td>
+    `;
+    row.querySelector('.btn-remove').addEventListener('click', () => row.remove());
+    tableBody.appendChild(row);
+  }
+
+  document.getElementById('addRowBtn').addEventListener('click', () => {
+    addRow();
+  });
+
+  // ✅ Handle multi-row paste
+  tableBody.addEventListener('paste', function (e) {
+    const targetCell = e.target;
+    if (!targetCell.isContentEditable) return;
+
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData('text/plain');
+
+    const rowsData = pasteData.trim().split(/\r?\n/).map(row =>
+      row.split(/\t|,/).map(cell => cell.trim())
+    );
+
+    let startRow = targetCell.closest('tr');
+    if (!startRow) return;
+
+    let startRowIndex = Array.from(tableBody.children).indexOf(startRow);
+
+    while (tableBody.rows.length < startRowIndex + rowsData.length) {
+      addRow();
+    }
+
+    rowsData.forEach((cols, rowIndex) => {
+      const row = tableBody.rows[startRowIndex + rowIndex];
+      const cells = row.querySelectorAll('td[contenteditable="true"]');
+      cols.forEach((val, colIndex) => {
+        if (colIndex < cells.length) {
+          cells[colIndex].innerText = val;
+        }
+      });
+    });
+  });
+
+  // ✅ Handle submission
+  document.getElementById('submitBtn').addEventListener('click', async () => {
+    if (!selectedLot) {
+      toastr.warning('Please select a lot first.');
+      return;
+    }
+
+    const rows = tableBody.querySelectorAll('tr');
+    const data = [];
+
+    rows.forEach(row => {
+      const cells = row.querySelectorAll('td');
+      const name = cells[0].innerText.trim();
+      const lat = cells[1].innerText.trim();
+      const longVal = cells[2].innerText.trim();
+      const elevation = cells[3].innerText.trim();
+
+      if (name || lat || longVal || elevation) {
+        data.push({
+          name,
+          lat,
+          long: longVal,
+          elevation,
+          lot_id: selectedLot.id
+        });
+      }
+    });
+
+    if (data.length === 0) {
+      toastr.warning('Please fill in at least one row.');
+      return;
+    }
+
+    try {
+      const res = await fetch('http://localhost:3000/data/more_data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (!res.ok) throw new Error(await res.text());
+
+      toastr.success('Data submitted successfully!');
+      tableBody.innerHTML = '';
+      addRow();
+    } catch (err) {
+      toastr.error('Submission failed: ' + err.message);
+      console.error(err);
+    }
+  });
+
+  // ✅ Initial load
+  fetchLots().then(() => addRow());
+
+});
+
+
+
+
+// search function
+ document.getElementById('searchInput').addEventListener('input', function () {
+      const filter = this.value.toLowerCase().trim();
+      const rows = document.querySelectorAll('#coordinatesTable tr:not(.no-data-row)');
+      const noDataRow = document.querySelector('.no-data-row');
+      let hasMatch = false;
+
+      rows.forEach(row => {
+        const cornerCell = row.cells[0];
+        if (cornerCell) {
+          const text = cornerCell.textContent.toLowerCase();
+          if (!filter || text.includes(filter)) {
+            row.style.display = '';
+            hasMatch = true;
+          } else {
+            row.style.display = 'none';
+          }
+        }
+      });
+
+      if (noDataRow) {
+        noDataRow.style.display = hasMatch ? 'none' : '';
+      }
+    });
+
+
+// select row function 
+function updateRowSelection() {
+  const rowCount = parseInt(document.getElementById("rowCount").value);
+  const tableBody = document.getElementById("coordinatesTable");
+  const allRows = tableBody.querySelectorAll("tr");
+
+  if (rowCount === 0 || allRows.length === 0) {
+    allRows.forEach(row => row.style.display = 'none');
+    const noDataRow = tableBody.querySelector('.no-data-row');
+    if (noDataRow) noDataRow.style.display = '';
+    return;
+  }
+
+  let visibleCount = 0;
+
+  allRows.forEach(row => {
+    if (row.classList.contains('no-data-row')) {
+      row.style.display = 'none';
+      return;
+    }
+
+    if (visibleCount < rowCount) {
+      row.style.display = '';
+      visibleCount++;
+    } else {
+      row.style.display = 'none';
+    }
+  });
+}
+ </script>
+
+
